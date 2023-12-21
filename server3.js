@@ -27,14 +27,21 @@ async function getFromServe() {
             for (const item of response.data) {
 
                 const weighingData = await axios.post(
-                    `http://${process.env.HOST}:${process.env.PORT}/api/weighings`,
+                    `http://localhost:${process.env.PORT}/api/weighings`,
                    {data : item.weighing}
                 );
     
+
+
                 item.data.weighing = weighingData.data.data.id;
-    
+                item.data.from = process.env.ID_FROM  ;
+                item.data.to =  process.env.ID_TO ;
+                item.data.sender = process.env.ID_FROM  ;
+                item.data.receiver =  process.env.ID_TO ;
+
+
                 const transferData = await axios.post(
-                    `http://${process.env.HOST}:${process.env.PORT}/api/transports`,
+                    `http://localhost:${process.env.PORT}/api/transports`,
                     {data :  item.data }
                 );
     
@@ -57,13 +64,12 @@ async function getFromServe() {
 
 
 
-async function pushToServee() {
+async function pushToServe() {
     try {
         const strapiResponse = await axios.get(
-            `http://${process.env.HOST}:${process.env.PORT}/api/transports?populate=*&filters[receiver][id][$eq]=1&filters[isSync][$eq]=false`
+            `http://localhost:${process.env.PORT}/api/transports?populate=*&filters[receiver][id][$eq]=1&filters[isSync][$eq]=false`
         );
 
-        console.log('Retrieved', strapiResponse.data);
 
         // Use Promise.all to wait for all async operations to complete
 
@@ -81,6 +87,7 @@ async function pushToServee() {
                         hab: record.attributes.weighing.data.attributes.hab,
                         dal: record.attributes.weighing.data.attributes.dal,
                         tax: record.attributes.weighing.data.attributes.tax,
+                        batch : null ,
                         state: "TRANSFERT"
                     };
 
@@ -96,8 +103,8 @@ async function pushToServee() {
                         brut: record.attributes.brut,
                         tar: record.attributes.tar,
                         isSync: true,
-                        from: record.attributes.from && record.attributes.from.data ? record.attributes.from.data.id : null,
-                        to: record.attributes.to && record.attributes.to.data ? record.attributes.to.data.id : null,
+                        from: process.env.ID_FROM ,
+                        to: process.env.ID_TO ,
                         sender: record.attributes.sender && record.attributes.sender.data ? record.attributes.sender.data.id : null,
                         receiver: record.attributes.receiver && record.attributes.receiver.data ? record.attributes.receiver.data.id : null,
                         weighing: null
@@ -110,7 +117,7 @@ async function pushToServee() {
                         data: dataToUpdate,
                         weighing: weighingData
                     }).then(async response => {
-                        await axios.put(`${process.env.HOST}:${process.env.PORT}/api/transports/${record.id}`, {
+                        await axios.put(`http://localhost:${process.env.PORT}/api/transports/${record.id}`, {
                             data: {
                                 'isSync': true
                             }
@@ -150,7 +157,7 @@ setInterval(async () => {
 
     if (isReachable) {
         getFromServe();
-        pushToServee();
+        pushToServe();
     } else {
         console.log('No INTERNET 😔🥺❌');
     }
