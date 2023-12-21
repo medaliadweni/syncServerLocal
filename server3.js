@@ -34,7 +34,7 @@ async function getFromServe() {
 
 
                 item.data.weighing = weighingData.data.data.id;
-       
+       item.data.from = null  ;
 
                 const transferData = await axios.post(
                     `http://localhost:${process.env.PORT}/api/transports`,
@@ -93,17 +93,16 @@ async function pushToServe() {
                     const dataToUpdate = {
                         weight: record.attributes.weight,
                         vehicule: record.attributes.vehicule,
-                        amount: record.attributes.amount,
+                        amount: record.attributes.amount ? record.attributes.amount : 0,
                         matricule: record.attributes.matricule,
-                        transportation_price: record.attributes.transportation_price,
-                        brut: record.attributes.brut,
-                        tar: record.attributes.tar,
+                        transportation_price:  record.attributes.brut ?  record.attributes.transportation_price :0,
+                        brut: record.attributes.brut ? record.attributes.brut : 0,
+                        tar: record.attributes.tar ? record.attributes.tar : 0,
                         isSync: true,
                         from:  record.attributes.from && record.attributes.from.data ? record.attributes.from.data.id : null,
                         to: record.attributes.to && record.attributes.to.data ? record.attributes.to.data.id : null,
                         sender: record.attributes.sender && record.attributes.sender.data ? record.attributes.sender.data.id : null,
                         receiver: record.attributes.receiver && record.attributes.receiver.data ? record.attributes.receiver.data.id : null,
-                        weighing: null
                     };
                     let destinationWarehouse = record.attributes.receiver.data.name.replaceAll(' ', '')
 
