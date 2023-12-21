@@ -104,7 +104,7 @@ async function pushToServe() {
                         sender: record.attributes.sender && record.attributes.sender.data ? record.attributes.sender.data.id : null,
                         receiver: record.attributes.receiver && record.attributes.receiver.data ? record.attributes.receiver.data.id : null,
                     };
-                    let destinationWarehouse = record.attributes.receiver.data.name.replaceAll(' ', '')
+                    let destinationWarehouse = record.attributes.sender.data.attributes.name.replaceAll(' ', '')
 
                     await axios.post(`${process.env.SERVER_REMOTE}/api/data`, {
                         destination: destinationWarehouse,
