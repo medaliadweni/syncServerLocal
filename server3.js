@@ -34,11 +34,7 @@ async function getFromServe() {
 
 
                 item.data.weighing = weighingData.data.data.id;
-                item.data.from = process.env.ID_FROM  ;
-                item.data.to =  process.env.ID_TO ;
-                item.data.sender = process.env.ID_FROM  ;
-                item.data.receiver =  process.env.ID_TO ;
-
+       
 
                 const transferData = await axios.post(
                     `http://localhost:${process.env.PORT}/api/transports`,
@@ -103,16 +99,16 @@ async function pushToServe() {
                         brut: record.attributes.brut,
                         tar: record.attributes.tar,
                         isSync: true,
-                        from: process.env.ID_FROM ,
-                        to: process.env.ID_TO ,
+                        from:  record.attributes.from && record.attributes.from.data ? record.attributes.from.data.id : null,
+                        to: record.attributes.to && record.attributes.to.data ? record.attributes.to.data.id : null,
                         sender: record.attributes.sender && record.attributes.sender.data ? record.attributes.sender.data.id : null,
                         receiver: record.attributes.receiver && record.attributes.receiver.data ? record.attributes.receiver.data.id : null,
                         weighing: null
                     };
-
+                    let destinationWarehouse = record.attributes.receiver.data.name.replaceAll(' ', '')
 
                     await axios.post(`${process.env.SERVER_REMOTE}/api/data`, {
-                        destination: process.env.DESTINATION,
+                        destination: destinationWarehouse,
                         state: 'PENDING',
                         data: dataToUpdate,
                         weighing: weighingData
@@ -130,7 +126,6 @@ async function pushToServe() {
 
 
                   
-                    console.log('Updated Strapi record:', updatedDataResponse.data);
                 } catch (error) {
                     console.error('Error processing record:', error.message);
                 }
