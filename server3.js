@@ -21,13 +21,13 @@ async function isServerReachable(server) {
 }
 async function getFromServe() {
     try {
-        const responseServer = await axios.get(
+        await axios.get(
             `${process.env.SERVER_REMOTE}/api/data/${process.env.SOURCE}`
         ).then(async response => {
-            for (const item of responseServer.data) {
+            for (const item of response.data) {
 
                 const weighingData = await axios.post(
-                    `${process.env.HOST}:${process.env.PORT}/api/weighings`,
+                    `http://${process.env.HOST}:${process.env.PORT}/api/weighings`,
                    {data : item.weighing}
                 );
     
@@ -150,7 +150,7 @@ setInterval(async () => {
 
     if (isReachable) {
         getFromServe();
-        //  pushToServee();
+        pushToServee();
     } else {
         console.log('No INTERNET 😔🥺❌');
     }
